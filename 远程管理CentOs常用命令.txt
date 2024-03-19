@@ -1,0 +1,77 @@
+systemctl status [服务名]	——启动服务（例：systemctl status tomcat）
+
+systemctl stop [服务名]		——停止服务（例：systemctl stop tomcat）
+
+systemctl restart [服务名]	——重启服务（例：systemctl restart tomcat）
+
+systemctl enable [服务名]	——设置服务开机启动（例：systemctl enable tomcat）
+
+systemctl disable [服务名]	——禁止服务开机启动（例：systemctl disable tomcat）
+
+systemctl status [服务名]	——查看服务运行状态（例：systemctl status tomcat）
+
+———————————————————————————————————————————————————————————————————————————————
+
+Tomcat创建服务方法：
+
+1、输入：vim /lib/systemd/system/tomcat.service
+
+2、复制粘贴：
+[Unit]
+Description=Tomcat
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=[Tomcat根目录下的.pid文件路径]
+ExecStart=[Tomcat根目录]/bin/catalina.sh start
+ExecReload=[Tomcat根目录]/tomcat/bin/catalina.sh restart
+ExecStop=[Tomcat根目录]/bin/catalina.sh stop
+
+[Install]
+WantedBy=multi-user.target
+
+3、按esc并输入:wq保存退出
+
+4、vim [Tomcat根目录]/bin/catalina.sh
+
+5、找到并插入：
+{...
+#   USE_NOHUP       (Optional) If set to the string true the start command will
+#                   use nohup so that the Tomcat process will ignore any hangup
+#                   signals. Default is "false" unless running on HP-UX in which
+#                   case the default is "true"
+# -----------------------------------------------------------------------------
+
+【这里插入(注意没有中括号和冒号前的内容)：
+CATALINA_PID=[Tomcat根目录下的.pid文件路径]】
+
+# OS specific support.  $var _must_ be set to either true or false.
+
+cygwin=false
+...}
+
+6、输入：systemctl start tomcat查看是否能启动，如果jdk或java报错请参考第7步，
+否则请跳至第9步
+
+7、请确认是否安装jdk及相关环境变量（java -version可以查看），然后输入：
+vim [Tomcat根目录]/bin/setclasspath.sh
+
+8、找到并插入：
+{...
+# -----------------------------------------------------------------------------
+#  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
+#  are valid and consistent with the selected start-up options and set up the
+#  endorsed directory.
+
+【这里插入(注意没有中括号和冒号前的内容)：
+export JAVA_HOME=[jdk根目录，一般是/usr/local/jdk1.x.x_xxx]
+export JRE_HOME=[jre根目录，一般是/usr/local/jdk1.x.x_xxx/jre]】
+
+# -----------------------------------------------------------------------------
+
+# Make sure prerequisite environment variables are set
+if [ -z "$JAVA_HOME" ] && [ -z "$JRE_HOME" ]; then
+...}
+
+9、输入：systemctl enable tomcat以开机启动tomcat

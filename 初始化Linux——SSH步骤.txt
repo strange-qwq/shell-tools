@@ -1,0 +1,14 @@
+1.安装ssh
+yum install ssh -y
+2.在root目录下新建.ssh目录：
+mkdir /root/.ssh
+3.复制优盘中的ssh目录下的authorized_keys文件到/root/.ssh目录
+mkdir mnt/usb
+fdisk -l
+mount /dev/sdbxxx mnt/usb
+cp /mnt/usb/ssh/authorized_keys /root/.ssh/authorized_keys
+4.覆盖sshd_config配置文件
+cp /mnt/usb/ssh/sshd_config /etc/ssh/sshd_config
+umout /mnt/usb
+5.重启服务器
+reboot
